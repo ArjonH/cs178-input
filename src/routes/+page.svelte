@@ -1,2 +1,14 @@
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to read the documentation</p>
+<script>
+    import Calendar from '@event-calendar/core';
+    import TimeGrid from '@event-calendar/time-grid';
+
+    let plugins = [TimeGrid];
+    let options = {
+        view: 'timeGridWeek',
+        events: [
+            // your list of events
+        ]
+    };
+</script>
+å
+<Calendar {plugins} {options} />
