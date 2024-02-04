@@ -12,6 +12,7 @@
 	},
 	"devDependencies": {
 		"@event-calendar/core": "^2.6.1",
+		"@event-calendar/interaction": "^2.6.1",
 		"@event-calendar/time-grid": "^2.6.1",
 		"@playwright/test": "^1.28.1",
 		"@sveltejs/adapter-auto": "^3.0.0",
