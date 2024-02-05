@@ -1,7 +1,9 @@
 <script>
     import '@event-calendar/core/index.css';
-    import { goto } from '$app/navigation';
+
     import { googleEventsStore } from './stores.js';
+    
+    export let googleEvents;
 
     const CLIENT_ID = '669688591392-rhdn9ebnpq24fc3l08m45ud6tbh8rf4j.apps.googleusercontent.com';
     const API_KEY = 'AIzaSyDDfNxkzJppzzegvfAr9WGc-Y0RzlquirU';
@@ -75,8 +77,8 @@
         if (!events || events.length == 0) {
           return;
         }
+        googleEvents = events
         googleEventsStore.set(events);
-        goto('/calendar');
     }
 </script>
 
