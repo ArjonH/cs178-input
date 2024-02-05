@@ -3,12 +3,16 @@
     import TimeGrid from '@event-calendar/time-grid';
     import Interaction from '@event-calendar/interaction';
     import '@event-calendar/core/index.css';
+    import Modal from './Modal.svelte';
 
     let plugins = [TimeGrid, Interaction];
     let googleEvents;
     let showingGoogle = false;
     let ec;
-    let showAddEventModal = false;
+    let showModal = false;
+    let availabilitySure = true;
+    let clickedEventId;
+
     let options = {
         view: 'timeGridWeek',
         events: [],
@@ -24,13 +28,31 @@
             if (info.jsEvent.target === info.el.querySelector('button')) {
                 ec.removeEventById(info.event.id);
             }
-        }
+            else {
+                showModal = true;
+                clickedEventId = info.event.id;
+            }
+        },
+        eventBackgroundColor: 'green',
+        eventTextColor: 'black',
     };
 
     function addEvent(info) {
         ec.addEvent(info)
         ec = ec.unselect()
-        showAddEventModal = true;
+    }
+
+    function updateEvent() {
+        // Change the event color based on availability level (only if changing to unsure)
+        if (! availabilitySure) {
+            ec.addEvent(
+            {
+                ...ec.getEventById(clickedEventId),
+                backgroundColor: availabilitySure ? 'green' : 'yellow',
+            }
+            )
+            ec.removeEventById(clickedEventId)
+        }
     }
 
     const CLIENT_ID = '669688591392-rhdn9ebnpq24fc3l08m45ud6tbh8rf4j.apps.googleusercontent.com';
@@ -114,13 +136,7 @@
         if (!events || events.length == 0) {
           return;
         }
-        // Flatten to string to display
-        //console.log(events)
         googleEvents = events
-    //     const output = events.reduce(
-    //         (str, event) => `${str}${event.summary} (${event.start.dateTime || event.start.date})\n`,
-    //         'Events:\n');
-    //     console.log(output)
     }
 
     function showGoogleEvents() {
@@ -165,18 +181,34 @@
     <button id="hide Google calendar" on:click={() => hideGoogleEvents()}>Hide Google Calendar</button>
 {/if}
 
+<Modal bind:showModal>
+    <h2 slot="header">
+		Add Information about your Availability
+	</h2>
+    <span class="space-y-2">
+        <label>
+            <input
+                type="radio"
+                name="availability type"
+                value={true}
+                bind:group={availabilitySure}
+            />
+
+            Definitely free
+        </label>
+        <label>
+            <input
+                type="radio"
+                name="availability type"
+                value={false}
+                bind:group={availabilitySure}
+            />
+
+            Possibly free
+        </label>
+        <button on:click={() => updateEvent()}>Submit</button>
+    </span>
+</Modal>
+
 <Calendar bind:this={ec} {plugins} {options} />
 
-<!-- Events:
-ES 94 (2024-02-05T12:45:00-05:00)
-CS 178 (2024-02-05T15:45:00-05:00)
-Neuro 140 (2024-02-06T15:00:00-05:00)
-ES 94 (2024-02-07T12:45:00-05:00)
-CS 178 (2024-02-07T15:45:00-05:00)
-CS 178 Section (2024-02-08T12:45:00-05:00)
-DPI 664M (2024-02-08T16:30:00-05:00)
-Neuro 140 Tutorial 2 (2024-02-08T18:00:00-05:00)
-IC New Romantics (2024-02-08T19:00:00-05:00)
-IC Alumni Dinner (2024-02-10T19:30:00-05:00) -->
-
-<!-- {start: days[0] + " 00:00", end: days[0] + " 09:00", resourceId: 1, display: "background"}, -->
