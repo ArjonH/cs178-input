@@ -10,8 +10,8 @@
     let plugins = [TimeGrid, Interaction];
     let googleEvents;
     googleEventsStore.subscribe(value => {
-    googleEvents = value;
-  });
+        googleEvents = value;
+    });
     let showingGoogle = false;
     let ec;
     let showModal = false;
@@ -60,42 +60,6 @@
         }
     }
 
-    const CLIENT_ID = '669688591392-rhdn9ebnpq24fc3l08m45ud6tbh8rf4j.apps.googleusercontent.com';
-    const API_KEY = 'AIzaSyDDfNxkzJppzzegvfAr9WGc-Y0RzlquirU';
-
-    const DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest';
-    const SCOPES = 'https://www.googleapis.com/auth/calendar.readonly';
-    let tokenClient;
-    let gapiInited = false;
-    let gisInited = false;
-
-    function gapiLoaded() {
-        gapi.load('client', initializeGapiClient);
-    }
-    async function initializeGapiClient() {
-        await gapi.client.init({
-          apiKey: API_KEY,
-          discoveryDocs: [DISCOVERY_DOC],
-        });
-        gapiInited = true;
-        maybeEnableButtons();
-    }
-    function gisLoaded() {
-        tokenClient = google.accounts.oauth2.initTokenClient({
-          client_id: CLIENT_ID,
-          scope: SCOPES,
-          callback: '', // defined later
-        });
-        gisInited = true;
-        maybeEnableButtons();
-    }
-
-    function maybeEnableButtons() {
-        if (gapiInited && gisInited) {
-          document.getElementById('authorize_button').style.visibility = 'visible';
-        }
-    }
-
     function handleSignoutClick() {
         const token = gapi.client.getToken();
         if (token !== null) {
@@ -134,10 +98,6 @@
     }
 </script>
 
-<svelte:head>
-    <script async defer src="https://apis.google.com/js/api.js" on:load={gapiLoaded()}></script>
-    <script async defer src="https://accounts.google.com/gsi/client" on:load={gisLoaded()}></script>
-</svelte:head>
 <button id="signout_button" on:click={() => handleSignoutClick()}>Sign Out</button>
 
 {#if !showingGoogle }
