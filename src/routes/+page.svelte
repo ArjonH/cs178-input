@@ -5,11 +5,13 @@
     import '@event-calendar/core/index.css';
 
     let plugins = [TimeGrid, Interaction];
-    let eventsList = [];
+    let googleEvents;
+    let showingGoogle = false;
     let ec;
+    let showAddEventModal = false;
     let options = {
         view: 'timeGridWeek',
-        events: eventsList,
+        events: [],
         selectable: true,
         editable: true,
         select: function (info) {
@@ -28,6 +30,7 @@
     function addEvent(info) {
         ec.addEvent(info)
         ec = ec.unselect()
+        showAddEventModal = true;
     }
 
     const CLIENT_ID = '669688591392-rhdn9ebnpq24fc3l08m45ud6tbh8rf4j.apps.googleusercontent.com';
@@ -49,7 +52,6 @@
         });
         gapiInited = true;
         maybeEnableButtons();
-        console.log("gapi")
     }
     function gisLoaded() {
         tokenClient = google.accounts.oauth2.initTokenClient({
@@ -62,14 +64,12 @@
     }
 
     function maybeEnableButtons() {
-        console.log("enabled")
         if (gapiInited && gisInited) {
           document.getElementById('authorize_button').style.visibility = 'visible';
         }
     }
 
     function handleAuthClick() {
-        console.log("auth")
         tokenClient.callback = async (resp) => {
           if (resp.error !== undefined) {
             throw (resp);
@@ -92,9 +92,6 @@
         if (token !== null) {
           google.accounts.oauth2.revoke(token.access_token);
           gapi.client.setToken('');
-          document.getElementById('content').innerText = '';
-          document.getElementById('authorize_button').innerText = 'Authorize';
-          document.getElementById('signout_button').style.visibility = 'hidden';
         }
     }
     async function listUpcomingEvents() {
@@ -115,16 +112,44 @@
         }
         const events = response.result.items;
         if (!events || events.length == 0) {
-          document.getElementById('content').innerText = 'No events found.';
           return;
         }
         // Flatten to string to display
-        const output = events.reduce(
-            (str, event) => `${str}${event.summary} (${event.start.dateTime || event.start.date})\n`,
-            'Events:\n');
-        console.log(output)
+        //console.log(events)
+        googleEvents = events
+    //     const output = events.reduce(
+    //         (str, event) => `${str}${event.summary} (${event.start.dateTime || event.start.date})\n`,
+    //         'Events:\n');
+    //     console.log(output)
     }
 
+    function showGoogleEvents() {
+        googleEvents.forEach(event => {
+            ec.addEvent(
+                {
+                    title: event.summary,
+                    start: event.start.dateTime,
+                    end: event.end.dateTime,
+                    backgroundColor: 'pink',
+                    textColor: 'black',
+                    extendedProps: {
+                        isGoogle: true
+                    }
+                }
+            )
+        });
+        showingGoogle = true;
+    }
+
+    function hideGoogleEvents() {
+        ec.getEvents().forEach(event => { 
+            if (event.extendedProps.isGoogle) {
+                ec.removeEventById(event.id)
+            }
+        }); 
+        
+        showingGoogle = false;
+    }
 </script>
 
 <svelte:head>
@@ -133,4 +158,25 @@
 </svelte:head>
 <button id="authorize_button" on:click={() => handleAuthClick()}>Authorize</button>
 <button id="signout_button" on:click={() => handleSignoutClick()}>Sign Out</button>
+
+{#if !showingGoogle }
+    <button id="show Google calendar" on:click={() => showGoogleEvents()}>Show Google Calendar</button>
+{:else}
+    <button id="hide Google calendar" on:click={() => hideGoogleEvents()}>Hide Google Calendar</button>
+{/if}
+
 <Calendar bind:this={ec} {plugins} {options} />
+
+<!-- Events:
+ES 94 (2024-02-05T12:45:00-05:00)
+CS 178 (2024-02-05T15:45:00-05:00)
+Neuro 140 (2024-02-06T15:00:00-05:00)
+ES 94 (2024-02-07T12:45:00-05:00)
+CS 178 (2024-02-07T15:45:00-05:00)
+CS 178 Section (2024-02-08T12:45:00-05:00)
+DPI 664M (2024-02-08T16:30:00-05:00)
+Neuro 140 Tutorial 2 (2024-02-08T18:00:00-05:00)
+IC New Romantics (2024-02-08T19:00:00-05:00)
+IC Alumni Dinner (2024-02-10T19:30:00-05:00) -->
+
+<!-- {start: days[0] + " 00:00", end: days[0] + " 09:00", resourceId: 1, display: "background"}, -->
