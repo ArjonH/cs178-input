@@ -1,7 +1,8 @@
 <script>
     import '@event-calendar/core/index.css';
     import { goto } from '$app/navigation';
-    import { googleEventsStore } from './stores.js';
+    import { nameStore } from './stores.js';
+    import { Button, Input, Container } from '@sveltestrap/sveltestrap';
 
     const CLIENT_ID = '669688591392-rhdn9ebnpq24fc3l08m45ud6tbh8rf4j.apps.googleusercontent.com';
     const API_KEY = 'AIzaSyDDfNxkzJppzzegvfAr9WGc-Y0RzlquirU';
@@ -11,6 +12,7 @@
     let tokenClient;
     let gapiInited = false;
     let gisInited = false;
+    let name;
 
     function gapiLoaded() {
         gapi.load('client', initializeGapiClient);
@@ -21,7 +23,6 @@
           discoveryDocs: [DISCOVERY_DOC],
         });
         gapiInited = true;
-        maybeEnableButtons();
     }
     function gisLoaded() {
         tokenClient = google.accounts.oauth2.initTokenClient({
@@ -30,53 +31,11 @@
           callback: '', // defined later
         });
         gisInited = true;
-        maybeEnableButtons();
     }
 
-    function maybeEnableButtons() {
-        if (gapiInited && gisInited) {
-          document.getElementById('authorize_button').style.visibility = 'visible';
-        }
-    }
-
-    function handleAuthClick() {
-        tokenClient.callback = async (resp) => {
-          if (resp.error !== undefined) {
-            throw (resp);
-          }
-          await listUpcomingEvents();
-        };
-        if (gapi.client.getToken() === null) {
-          // Prompt the user to select a Google Account and ask for consent to share their data
-          // when establishing a new session.
-          tokenClient.requestAccessToken({prompt: 'consent'});
-        } else {
-          // Skip display of account chooser and consent dialog for an existing session.
-          tokenClient.requestAccessToken({prompt: ''});
-        }
-    }
-    async function listUpcomingEvents() {
-        let response;
-        try {
-          const request = {
-            'calendarId': 'primary',
-            'timeMin': (new Date()).toISOString(),
-            'showDeleted': false,
-            'singleEvents': true,
-            'maxResults': 10,
-            'orderBy': 'startTime',
-          };
-          response = await gapi.client.calendar.events.list(request);
-        } catch (err) {
-          document.getElementById('content').innerText = err.message;
-          return;
-        }
-        const events = response.result.items;
-        if (!events || events.length == 0) {
-          return;
-        }
-        googleEventsStore.set(events);
-        goto('/calendar');
+    function login() {
+        nameStore.set(name);
+        goto('/calendar')
     }
 </script>
 
@@ -84,5 +43,8 @@
     <script async defer src="https://apis.google.com/js/api.js" on:load={gapiLoaded()}></script>
     <script async defer src="https://accounts.google.com/gsi/client" on:load={gisLoaded()}></script>
 </svelte:head>
-<button id="authorize_button" on:click={() => handleAuthClick()}>Authorize</button>
 
+<Container>
+    <Input placeholder="Name" bind:value={name}/>
+    <Button color="primary" id="login" on:click={() => login()}>Submit</Button>
+</Container>
