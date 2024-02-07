@@ -76,6 +76,7 @@
           google.accounts.oauth2.revoke(token.access_token);
           gapi.client.setToken('');
         }
+        hideGoogleEvents();
         googleLogin=false;
     }
 
