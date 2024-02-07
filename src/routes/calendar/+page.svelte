@@ -4,7 +4,6 @@
     import Interaction from '@event-calendar/interaction';
     import '@event-calendar/core/index.css';
     import { nameStore } from '../stores.js';
-    import { goto } from '$app/navigation';
     import { Button, Container, Modal, ModalBody, ModalFooter, Row, Col, ListGroup, ListGroupItem } from '@sveltestrap/sveltestrap';
 
     let plugins = [TimeGrid, Interaction];
@@ -38,7 +37,8 @@
             addEvent(info)
         },
         eventContent: function(info)  {
-            return {html: '<div class="ec-event-time">' + info.timeText + '</div>' + '<div class="ec-event-title">' + info.event.title + '</div>'+ '<Button>X</Button>'}
+            let buttonHtml = info.event.extendedProps.isGoogle ? '' : '<Button>X</Button>';
+            return {html: '<div class="ec-event-time">' + info.timeText + '</div>' + '<div class="ec-event-title">' + info.event.title + '</div>'+ buttonHtml}
         },
         eventClick: function(info) {
             if (info.jsEvent.target === info.el.querySelector('button')) {
@@ -155,7 +155,7 @@
             'timeMin': (new Date()).toISOString(),
             'showDeleted': false,
             'singleEvents': true,
-            'maxResults': 10,
+            'maxResults': 15,
             'orderBy': 'startTime',
           };
           response = await gapi.client.calendar.events.list(request);
@@ -180,7 +180,7 @@
 <Container>
     <Row>
         <Col xs="auto">
-            <h1>Welcome to weekly scheduler {name}</h1>
+            <h1>{name}'s availability</h1>
         </Col>
     </Row>
     <Row>
@@ -189,9 +189,10 @@
             <ListGroupItem>To show your availability, click and drag directly on the calendar. You can move an availability window or extend the window.</ListGroupItem>
             <ListGroupItem>To remove an event click on the X icon directly on the event</ListGroupItem>
             <ListGroupItem>To change the availability status of an event (from definitely available to possibly free) click directly on the event</ListGroupItem>
-            <ListGroupItem>If you logged in with your Google Account you can display your Google calendar events to schedule around.</ListGroupItem>
-            <ListGroupItem>To log in with your Google Account click the Authorize Google Account Button</ListGroupItem>
-            <ListGroupItem>Once you are logged in you will have the option to display your Google Calendar events. These are just a placeholder and will not be sent to other users. Having a Google Event at a time also does not prevent you from choosing that as an available time.</ListGroupItem>
+            <ListGroupItem>If you logged in with your Google Account, you can display your Google calendar events to schedule around.</ListGroupItem>
+            <ListGroupItem>To log in with your Google Account, click Authorize Google Account</ListGroupItem>
+            <ListGroupItem>Once you are logged in you will have the option to display your Google Calendar events. These are just a placeholder and will not be sent to other users. 
+                Having a Google Event at a time also does not prevent you from choosing that as an available time.</ListGroupItem>
             <ListGroupItem>If your Google account events are being displayed, you can also toggle this off to see the calendar without them</ListGroupItem>
         </ListGroup>
     </Row>
