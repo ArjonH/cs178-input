@@ -4,20 +4,22 @@
     import Interaction from '@event-calendar/interaction';
     import '@event-calendar/core/index.css';
     import { nameStore } from '../stores.js';
-    import { Button, Container, Modal, ModalBody, ModalFooter, Row, Col, ListGroup, ListGroupItem } from '@sveltestrap/sveltestrap';
+    import { Button, Container, Modal, ModalBody, ModalFooter, Row, Col, ListGroup, ListGroupItem, Icon, ModalHeader } from '@sveltestrap/sveltestrap';
 
     let plugins = [TimeGrid, Interaction];
-    let googleEvents;
+    let googleEvents; // store for the events imported from Google calendar
+    // Get the name the user inputted in previous page
     let name;
     nameStore.subscribe(value => {
         name = value;
     });
-    let showingGoogle = false;
+    let showingGoogle = false; // Variable keeping track of if Google calendar is showing
     let ec;
-    let showEditEventModal = false;
-    $: availabilitySure = true;
-    let clickedEventId;
-    let googleLogin = false;
+    let showEditEventModal = false; // Variable that toggles to show or close modal
+    let availabilitySure = true; // Variable to determine degree of availability
+    $: availabilitySure
+    let clickedEventId; // The ID of the last clicked event
+    let googleLogin = false; // Stores if user is logged into their Google account
 
     const CLIENT_ID = '669688591392-rhdn9ebnpq24fc3l08m45ud6tbh8rf4j.apps.googleusercontent.com';
     const API_KEY = 'AIzaSyDDfNxkzJppzzegvfAr9WGc-Y0RzlquirU';
@@ -30,20 +32,25 @@
 
     let options = {
         view: 'timeGridWeek',
+        scrollTime: '09:00:00',
         events: [],
-        selectable: true,
+        selectable: true, 
         editable: true,
+        // When a user makes a selection, add that event
         select: function (info) {
             addEvent(info)
         },
+        // Add a X button on each event so user can delete event
         eventContent: function(info)  {
             let buttonHtml = info.event.extendedProps.isGoogle ? '' : '<Button>X</Button>';
             return {html: '<div class="ec-event-time">' + info.timeText + '</div>' + '<div class="ec-event-title">' + info.event.title + '</div>'+ buttonHtml}
         },
         eventClick: function(info) {
+            // If user clicks the X button delete the event
             if (info.jsEvent.target === info.el.querySelector('button')) {
                 ec.removeEventById(info.event.id);
             }
+            // If user clicks the event show the edit event modal
             else {
                 showEditEventModal = true;
                 clickedEventId = info.event.id;
@@ -68,8 +75,10 @@
         )
         ec.removeEventById(clickedEventId)
         showEditEventModal = false;
+        availabilitySure = true;
     }
 
+    // Sign out of Google account
     function handleSignoutClick() {
         const token = gapi.client.getToken();
         if (token !== null) {
@@ -80,6 +89,7 @@
         googleLogin=false;
     }
 
+    // Display the user's Google events on the calendar
     function showGoogleEvents() {
         googleEvents.forEach(event => {
             ec.addEvent(
@@ -87,7 +97,7 @@
                     title: event.summary,
                     start: event.start.dateTime,
                     end: event.end.dateTime,
-                    backgroundColor: 'pink',
+                    backgroundColor: 'red',
                     display: 'background',
                     textColor: 'black',
                     extendedProps: {
@@ -99,6 +109,7 @@
         showingGoogle = true;
     }
 
+    // Hide the user's Google events from the calendar
     function hideGoogleEvents() {
         ec.getEvents().forEach(event => { 
             if (event.extendedProps.isGoogle) {
@@ -130,6 +141,7 @@
         gisInited = true;
     }
 
+    // Log in to user's Google account
     function handleAuthClick() {
         tokenClient.callback = async (resp) => {
           if (resp.error !== undefined) {
@@ -148,6 +160,7 @@
         }
     }
 
+    // Get user's Google events
     async function listUpcomingEvents() {
         let response;
         try {
@@ -169,6 +182,7 @@
           return;
         }
         googleEvents = events;
+        showGoogleEvents();
     }
 
 </script>
@@ -176,6 +190,7 @@
 <svelte:head>
     <script async defer src="https://apis.google.com/js/api.js" on:load={gapiLoaded()}></script>
     <script async defer src="https://accounts.google.com/gsi/client" on:load={gisLoaded()}></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css">
 </svelte:head>
 
 <Container>
@@ -214,7 +229,10 @@
     </Row>
 </Container>
 
-<Modal body header="Add Information about your Availability" isOpen={showEditEventModal} {updateEvent}>
+<Modal isOpen={showEditEventModal} on:click={() => showEditEventModal=false}>
+    <ModalHeader>
+        Add Information about your Availability
+    </ModalHeader>
     <ModalBody>
         <label>
             <input
@@ -234,12 +252,14 @@
                 bind:group={availabilitySure}
             />
 
-            Possibly free
+            Free if necessary
         </label>
         <Button color="success" on:click={() => updateEvent()}>Submit</Button>
     </ModalBody>
     <ModalFooter>
-        <Button color="info" on:click={() => showEditEventModal=false}>Close</Button>
+        <Button  on:click={() => showEditEventModal=false}>
+            <Icon name="x-lg" />
+        </Button>
     </ModalFooter>
 </Modal>
 
