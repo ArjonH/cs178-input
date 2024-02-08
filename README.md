@@ -36,3 +36,15 @@ npm run build
 You can preview the production build with `npm run preview`.
 
 > To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+
+## Citations
+For Google Calendar API:
+- https://developers.google.com/calendar/api/quickstart/js
+- https://www.appsloveworld.com/google-api/4/how-to-load-google-api-client-library-with-sveltekit
+- https://stackoverflow.com/questions/70570231/how-to-load-google-api-client-library-with-sveltekit
+
+For Svelte Calendar Package:
+- https://github.com/vkurko/calendar
+
+For Sveltestrap:
+- https://sveltestrap.js.org/?path=/docs/sveltestrap-overview--docs
