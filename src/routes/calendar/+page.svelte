@@ -32,10 +32,11 @@
 
     let options = {
         view: 'timeGridWeek',
-        scrollTime: '09:00:00',
         events: [],
         selectable: true, 
         editable: true,
+        slotMinTime: '9:00:00', //Have calendar start at 9am
+		slotMaxTime: '23:00:00', //End at 11pm
         // When a user makes a selection, add that event
         select: function (info) {
             addEvent(info)
