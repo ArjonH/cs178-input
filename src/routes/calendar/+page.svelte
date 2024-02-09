@@ -203,14 +203,9 @@
     <Row>
         <h2>How to use:</h2>
         <ListGroup numbered>
-            <ListGroupItem>To show your availability, click and drag directly on the calendar. You can move an availability window or extend the window.</ListGroupItem>
-            <ListGroupItem>To remove an event click on the X icon directly on the event</ListGroupItem>
-            <ListGroupItem>To change the availability status of an event (from definitely available to possibly free) click directly on the event</ListGroupItem>
-            <ListGroupItem>If you logged in with your Google Account, you can display your Google calendar events to schedule around.</ListGroupItem>
-            <ListGroupItem>To log in with your Google Account, click Authorize Google Account</ListGroupItem>
-            <ListGroupItem>Once you are logged in you will have the option to display your Google Calendar events. These are just a placeholder and will not be sent to other users. 
-                Having a Google Event at a time also does not prevent you from choosing that as an available time.</ListGroupItem>
-            <ListGroupItem>If your Google account events are being displayed, you can also toggle this off to see the calendar without them</ListGroupItem>
+            <ListGroupItem>Click and drag to enter your availability, X to delete</ListGroupItem>
+            <ListGroupItem>Authorize Google to display your GCal events (these will not be sent)</ListGroupItem>
+            <ListGroupItem>Indicate level of availability (definitely free or free if necessary) by clicking directly on the timeslot</ListGroupItem>
         </ListGroup>
     </Row>
     <Row>

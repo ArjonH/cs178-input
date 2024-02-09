@@ -78,4 +78,5 @@ For Sveltestrap:
 Hever:
 - Initial calendar / github setup
 - Adding intro page + store
-- Styling page 1 -->
+- Styling page 1
+- Minor edits after playtesting -->
