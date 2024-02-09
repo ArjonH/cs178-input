@@ -61,6 +61,7 @@
         eventTextColor: 'black',
     };
 
+    // When a user makes a selection on the calendar add an event and unselect
     function addEvent(info) {
         ec.addEvent(info)
         ec = ec.unselect()
@@ -121,6 +122,7 @@
         showingGoogle = false;
     }
 
+    //Functions to authorize Google account:
     function gapiLoaded() {
         gapi.load('client', initializeGapiClient);
     }
@@ -209,10 +211,12 @@
         </ListGroup>
     </Row>
     <Row>
+        <!-- Change which buttons are shown based on the status of Google authorization -->
         <Col>
             {#if !googleLogin }
                 <Button color="success" id="authorize_button" on:click={() => handleAuthClick()}>Authorize Google Account</Button>
             {/if}
+            <!-- Allow user to choose to show Google calendar or hide it once they have logged in -->
             {#if !showingGoogle && googleLogin }
                 <Button color="success" id="show Google calendar" on:click={() => showGoogleEvents()}>Show Google Calendar</Button>
             {:else if googleLogin}
@@ -225,10 +229,12 @@
     </Row>
 </Container>
 
+<!-- Modal Component -->
 <Modal isOpen={showEditEventModal} on:click={() => showEditEventModal=false}>
     <ModalHeader>
         Add Information about your Availability
     </ModalHeader>
+    <!-- The body of the modal is radio buttons to edit the event -->
     <ModalBody>
         <label>
             <input
